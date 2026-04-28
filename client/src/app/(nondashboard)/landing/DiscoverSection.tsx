@@ -4,7 +4,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import Link from 'next/link'
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -39,32 +38,41 @@ const DiscoverSection = () => {
             variants={itemVariants}
             className='my-12 text-center'
             >
-                Quickly  find the home you want using our effective search filters!
-            </motion.div>
+<h2 className='text-3xl font-semibold leading-tight text-gray-800'>
+    Discover
+    </h2> 
+    <p className='mt-4 text-lg text-gray-600'>
+  Searching for your dream rental property has never been easier. With
+            our user-friendly search feature, you can quickly find the perfect
+            home that meets all your needs. Start your search today and discover
+            your dream rental property!
+                    </p>
+
+    <p className='mt-2 text-gray-500 max-w-3xl mx-auto'>
+        Searching for
+
+    </p>
+    </motion.div>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 xl:gap-16'>
-                {[0,1,2].map((index) => (
-                    <motion.div
-                    key={index}
+                {[
+                    {
+                        imageSrc: "/landing-icon-wand.png",
+                        title: "Search for Properties",
+                        description: "Browse through our extensive collection of rental properties in you desired location"
+                    },  {
+                        imageSrc: "/landing-icon-calendar.png",
+                        title: "Book Your Rental",
+                        description: "Once you've found your ideal rental, easily book it online with just a few clicks "
+                    },  {
+                        imageSrc: "/landing-icon-heart.png",
+                        title: "Enjoy your new Home",
+                        description: "Move into your new rental property and start enjoying your dream home"
+                    },
+                ].map((card, index) => (
+                    <motion.div key={index}
                     variants={itemVariants}>
-                        <Featurecard imageSrc = {`/landing-search${3-index}.png`} 
-                        title= {["Thrustworthy and Verified Listings",
-                            "Brows Rental Listings with Ease",
-                            "Simplify Your Rental Search with Advanced Filters"][index]
-
-                        }
-                         description= {["Discover the best rental options with user reviews and rankings",
-                            "Get access to user reviews and ratings for a better understanding of rental options",
-                            "Find trustworthy and verified rental listings to ensure a hassle-free experience"][index]
-
-                        }
-
-                        linkText={["Explore", "Search" , "Discover"][index]}
-                        linkHref={["/explore", "/search" , "/discover"][index]}
-
-                        
-                        />
-
-                    </motion.div>
+                        <Discovercard {...card}/>
+                        </motion.div>
                 ))}
             </div>
             </div>
@@ -75,41 +83,33 @@ const DiscoverSection = () => {
   )
 }
 
-        const Featurecard = (
+        const Discovercard = (
             {
                 imageSrc,
                 title,
                 description,
-                linkText,
-                linkHref
+
             } : {
                 imageSrc: string,
                 title: string,
                 description: string,    
-                linkText: string,
-                linkHref: string
+             
             }
                 ) => {
                     return (
-                        <div className = "text-center">
-            <div className= "p-4 rounded-lg mb-4 flex items-center justify-center h-48"> 
+                        <div className = "px-4 py-12 shadow -lg rounded-lg bg-primary-50 md:h-72 text-center">
+            <div className= "bg-primary-700 p-[0.6rem] rounded-full mb-4 h-10 w-10 mx-auto"> 
                 <Image src= {imageSrc}
-                width={400}
-                height= {400}
-                className= "w-full h-full object-contain" 
+                width={30}
+                height= {30}
+                className= "w-full h-full" 
                 alt={title}/>
                  </div>
-                 <h3 className='text-xl font-semibold mb-2'> {title}</h3>
+                 <h3 className='text-xl font-medium mb-4 text-gray-800'> {title}</h3>
+                 <p className='mt-2 text-base text-gray-500'></p>
+                 
                  <p className='mb-4'>{description}</p>
-                 <Link
-                 href={linkHref}
-                 className='inline-block border border-gray-300 rounded px-4 py-2 hover:bg'
-                 scroll={false}
-                 >
-                    {linkText}
-
-
-                 </Link>
+                 
 
                 </div>
                     )

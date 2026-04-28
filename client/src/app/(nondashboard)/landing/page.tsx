@@ -2,6 +2,7 @@ import React from 'react'
 import HeroSection from './HeroSection'
 import FeatureSection from './FeatureSection'
 import DiscoverSection from './DiscoverSection'
+import CallToActionSection from './CallToActionSection'
 
 
  const Landing = () => {
@@ -10,6 +11,7 @@ import DiscoverSection from './DiscoverSection'
       <HeroSection/>
     <FeatureSection/>
     <DiscoverSection/>
+    <CallToActionSection/>
     
     
     </div>
