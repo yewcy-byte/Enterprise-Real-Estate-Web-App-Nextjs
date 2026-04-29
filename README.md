@@ -7,3 +7,5 @@ shadcn is a component library write what you need in the terminal and a componen
 
 
 scroll={false} to fix the page position when navigating to the new page normally with Link component
+
+aria-label element for icons to enable screen readers like the blind to know its a facebook icon
