@@ -6,7 +6,10 @@
   "scripts": {
     "build": "rimraf dist && npx tsc",
     "start": "npm run build && node dist/index.js",
-    "dev": "npm run build && concurrently \"npx tsc -w\" \"tsx watch ./src/index.ts\""
+    "dev": "npm run build && concurrently \"npx tsc -w\" \"tsx watch ./src/index.ts\"",
+    "seed": "tsx prisma/seed.ts",
+    "prisma:generate": "prisma generate",
+    "postprisma:generate" : "shx cp -r node_modules/.prisma/client/index.d.ts ../client/src/types/prismaTypes.d.ts"
   },
   "keywords": [],
   "author": "",
@@ -27,5 +30,10 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "prisma": "^7.8.0",
+    "pg": "^8.11.0"
   }
 }
