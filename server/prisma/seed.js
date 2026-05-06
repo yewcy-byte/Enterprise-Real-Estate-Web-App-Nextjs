@@ -31,7 +31,7 @@ async function insertLocationData(locations) {
 async function resetSequence(modelName) {
     const quotedModelName = `"${toPascalCase(modelName)}"`;
     try {
-        await pool.query(`SELECT setval(pg_get_serial_sequence('${toPascalCase(modelName)}', 'id'), COALESCE(MAX(id)+1, 1), false) FROM ${quotedModelName};`);
+        await pool.query(`SELECT setval(pg_get_serial_sequence('\"${toPascalCase(modelName)}\"', 'id'), COALESCE(MAX(id)+1, 1), false) FROM ${quotedModelName};`);
         console.log(`Reset sequence for ${modelName}`);
     }
     catch (err) {
@@ -57,6 +57,9 @@ async function insertGeneric(modelName, items) {
         const filteredItem = Object.fromEntries(Object.entries(item).filter(([, value]) => {
             return value === null || Array.isArray(value) || typeof value !== "object";
         }));
+        if (filteredItem.leaseId == null && item.lease?.connect?.id != null) {
+            filteredItem.leaseId = item.lease.connect.id;
+        }
         const cols = Object.keys(filteredItem);
         const values = cols.map((_, i) => `$${i + 1}`).join(",");
         const params = cols.map((c) => filteredItem[c]);
