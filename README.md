@@ -11,3 +11,5 @@ scroll={false} to fix the page position when navigating to the new page normally
 aria-label element for icons to enable screen readers like the blind to know its a facebook icon
 
 used postgreSQL Geospatial (GIS): Through PostGIS, Postgres is the gold standard for mapping, location tracking, and distance calculations.
+
+we use <main> firstly its for the blind screen readers, they have shortcut to jump to the main content. SEO will give more weight to the keywords found inside main . One page can only consist one main tag

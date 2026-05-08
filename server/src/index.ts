@@ -1,9 +1,13 @@
-import express from"express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from"body-parser";
 import helmet from "helmet";
 import morgan from "morgan";
+import { authMiddleware } from "./middleware/authMiddleware.js";
+import tenantRoutes from "./routes/tenantRoutes.js";
+import ManagerRoutes from "./routes/managerRoutes.js";
+
 /* route import */
 
 
@@ -23,6 +27,9 @@ app.use(cors());
 app.get('/', (req, res) =>{
     res.send("This is home route");
 });
+
+app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
+app.use("/managers", authMiddleware(["manager"]), ManagerRoutes);
 
 /*server*/
 const port = process.env.PORT || 3002;

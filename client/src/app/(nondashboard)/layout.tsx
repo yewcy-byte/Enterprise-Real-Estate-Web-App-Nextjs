@@ -1,8 +1,13 @@
+"use client"; 
+
 import React from 'react'
 import { NAVBAR_HEIGHT } from '@/lib/constants'
 import Navbar from '@/components/navbar'
+import {  useGetAuthUserQuery } from '@/state/api'
 
 const layout = ({children} : {children : React.ReactNode}) => {
+ const {data:authUser} = useGetAuthUserQuery();
+ 
   return (
     <div className='h-full w-full'>
        <Navbar/>
