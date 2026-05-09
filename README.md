@@ -13,3 +13,5 @@ aria-label element for icons to enable screen readers like the blind to know its
 used postgreSQL Geospatial (GIS): Through PostGIS, Postgres is the gold standard for mapping, location tracking, and distance calculations.
 
 we use <main> firstly its for the blind screen readers, they have shortcut to jump to the main content. SEO will give more weight to the keywords found inside main . One page can only consist one main tag
+
+used redux tool kit (rival for tanstackquery) in the api.ts file to handle http request like get / put.It has 2 types build.query for fetching data and build.mutation for editing any data to the database 

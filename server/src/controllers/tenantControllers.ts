@@ -1,7 +1,5 @@
 import type { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma.js";
 
 export const getTenant = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -24,6 +22,7 @@ export const getTenant = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+
 export const createTenant = async (
     req: Request,
     res: Response
@@ -41,5 +40,26 @@ export const createTenant = async (
         res.status(201).json(tenant);
     } catch (error: any) {
         res.status(500).json({ message: `Error creating tenant: ${error.message}` });
+    }
+};
+
+export const updateTenant = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const cognitoId = req.params.cognitoId as string;
+        const { name, email, phoneNumber } = req.body;
+        const updateTenant = await prisma.tenant.update({
+            where: { cognitoId },
+            data: {
+                name: name as string,
+                email: email as string,
+                phoneNumber: phoneNumber as string,
+            },
+        });
+        res.json(updateTenant);
+    } catch (error: any) {
+        res.status(500).json({ message: `Error updating tenant: ${error.message}` });
     }
 };
