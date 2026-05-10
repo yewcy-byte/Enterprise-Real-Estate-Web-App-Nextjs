@@ -15,3 +15,9 @@ used postgreSQL Geospatial (GIS): Through PostGIS, Postgres is the gold standard
 we use <main> firstly its for the blind screen readers, they have shortcut to jump to the main content. SEO will give more weight to the keywords found inside main . One page can only consist one main tag
 
 used redux tool kit (rival for tanstackquery) in the api.ts file to handle http request like get / put.It has 2 types build.query for fetching data and build.mutation for editing any data to the database 
+
+client side filtering vs server side filtering. 
+Client side - easier to implement with external libaries and documentation can be found online
+Server side - sends less amount of data via the network which means faster speed 
+
+{...} is called spread operator, is copies all the properties that is already in the object to be used again, used for reformating to JSON object for example  ...property.location
