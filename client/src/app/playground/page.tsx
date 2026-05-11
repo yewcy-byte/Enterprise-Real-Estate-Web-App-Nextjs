@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Task2 from './components/task2';
+import Task3 from './components/task3';
 
 const page = () => {
 
@@ -15,7 +16,7 @@ const page = () => {
         setPressed(!pressed)
     }
   return (
-<div className='flex justify-center items-center p-6'>
+<div className='flex flex-col justify-center items-center p-6 space-y-5'>
         <div className={`${pressed? "bg-green-100" : "bg-red-100"} hover:shadow-md transition-all rounded-md  flex flex-col justify-center items-center space-y-3 w-fit`}>
                  <input 
                  className='text-xl h-10 m-3 p-3 border-2 rounded-4xl'
@@ -33,9 +34,14 @@ const page = () => {
 <div>
     <h1>{pressed? "pressed" : "unpressed"}</h1>
 </div>
+
         </div>
-        <Task2 />
-   
+        
+    <Task2 />
+
+    <Task3/>
+
+
 
     </div>
         

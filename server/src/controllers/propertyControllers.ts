@@ -187,7 +187,7 @@ export const createProperty = async (req: Request, res: Response): Promise<void>
                 state,
                 country,
                 postalCode,
-                managerCongitoId,
+                managerCognitoId,
                 ...propertyData
             } = req.body;
 
@@ -232,10 +232,14 @@ export const createProperty = async (req: Request, res: Response): Promise<void>
 
 
     //create location
-    const [location] = await prisma.$queryRaw<Location[]>`
+    const [location] = await prisma.$queryRaw<{ id: number }[]>`
     INSERT INTO "Location" (address, city, state, country, postalCode, coordinates)
     VALUES (${address}, ${city}, ${state}, ${country}, ${postalCode}, ST_SetSRID(ST_MakePoint(${longtitude}, ${latitude}), 4326))
     RETURNING id, address, city, state, country, "postalCode", ST_AsText(coordinates) as coordinates`;
+
+    if (!location) {
+        throw new Error("Failed to create location");
+    }
 
 //create property
 const newProperty = await prisma.property.create({
@@ -249,7 +253,16 @@ const newProperty = await prisma.property.create({
         ? propertyData.amenities.split(",") : [],
 
         highlights:
-        typeof
+        typeof propertyData.highlights === "string"
+        ? propertyData.highlights.split(",") : [],
+        isPetsAllowed: propertyData.isPetsAllowed === "true",
+        isParkingInclude: propertyData.isParkingIncluded === "true",
+        pricePerMonth: parseFloat (propertyData.pricePerMonth),
+        securityDeposit: parseFloat(propertyData.securityDeposit),
+        applicationFee: parseFloat(propertyData.applicationFee),
+        beds: parseInt(propertyData.beds),
+        baths: parseInt(propertyData.baths),
+        squareFeet: parseInt(propertyData.squareFeet),  
 
     }
 })
