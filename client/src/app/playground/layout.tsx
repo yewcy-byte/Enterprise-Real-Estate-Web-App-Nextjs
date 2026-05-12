@@ -7,6 +7,7 @@ const layout = ({children} : {children: React.ReactNode}) => {
         <Link href="/playground">Main</Link>
         <Link href="/playground/country">Country</Link>
         <Link href="/playground/weather">Weather</Link>
+        <Link href="/playground/projects">Projects</Link>
         <Link href="/landing"><span>RENT</span><span className='text-secondary-400'>iful</span></Link>
     </div>
     <main>{children}</main>
