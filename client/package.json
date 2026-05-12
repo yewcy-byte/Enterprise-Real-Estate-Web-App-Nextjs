@@ -16,6 +16,8 @@
     "@fortawesome/react-fontawesome": "^3.3.1",
     "@hookform/resolvers": "^5.2.2",
     "@reduxjs/toolkit": "^2.11.2",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.105.4",
     "aws-amplify": "^6.17.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
