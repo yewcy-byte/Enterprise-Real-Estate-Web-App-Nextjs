@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react'
 const task3 = () => {
 
 type BitcoinObject = {
-    price : string
+  price : string | number
     error? : string
 }
 
 const [loading,setLoading] = useState(false)
-const [price, setPrice] = useState("")
+const [price, setPrice] = useState<string>("")
 const [error, setError] = useState("")
 
 const newPrice = async () => {
@@ -16,13 +16,13 @@ setLoading(true)
 
 try{
 const res = await fetch("/api/bitcoin")
-const data = (await res.json()) as BitcoinObject
+const data = await res.json()
 
 if (!res.ok){
     throw new Error(data.error || "unable to fetch api")
 }
 
-setPrice(data.price)
+setPrice(String((data as BitcoinObject).price ?? ""))
 } catch (error){
 setError(error instanceof Error? error.message : "unable to fetch coingecko api" )
 }finally{
@@ -41,7 +41,7 @@ newPrice()
     onClick={newPrice}
     >{loading? "Loading..." : "Fetch Live Price"}</button>
     <h1>Current BitCoin Price</h1>
-    <h1>{error? error : price}</h1>
+    <h1>{error ? error : price}</h1>
 
     </div>
   )
