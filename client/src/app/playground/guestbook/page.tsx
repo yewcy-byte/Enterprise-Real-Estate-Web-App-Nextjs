@@ -1,8 +1,5 @@
-"use client"
-
 import React from 'react'
-import {useState} from 'react'
-import {createBrowserClient} from "@supabase/ssr"
+import {createClient} from "@supabase/supabase-js"
 import { addToSupabase } from '../actions'
 
 
@@ -16,7 +13,7 @@ const page = async () => {
           throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY')
         }
 
-        const supabase = createBrowserClient(url, apiKey)
+        const supabase = createClient(url, apiKey)
 
     const {data : allguestBooks} = await supabase.from("guestBook").select("*").order("id",{ascending: false})
   return (

@@ -1,9 +1,10 @@
-import type { Request, Response } from "express";
+ import type { Request, Response } from "express";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { wktToGeoJSON } from "@terraformer/wkt";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import axios from "axios";
+import type { Location } from "@prisma/client";
 
 
 const prisma = new PrismaClient();
@@ -232,7 +233,7 @@ export const createProperty = async (req: Request, res: Response): Promise<void>
 
 
     //create location
-    const [location] = await prisma.$queryRaw<{ id: number }[]>`
+    const [location] = await prisma.$queryRaw<Location[]>`
     INSERT INTO "Location" (address, city, state, country, postalCode, coordinates)
     VALUES (${address}, ${city}, ${state}, ${country}, ${postalCode}, ST_SetSRID(ST_MakePoint(${longtitude}, ${latitude}), 4326))
     RETURNING id, address, city, state, country, "postalCode", ST_AsText(coordinates) as coordinates`;
@@ -253,8 +254,7 @@ const newProperty = await prisma.property.create({
         ? propertyData.amenities.split(",") : [],
 
         highlights:
-        typeof propertyData.highlights === "string"
-        ? propertyData.highlights.split(",") : [],
+        typeof propertyData.highlights === "string"? propertyData.highlights.split(",") : [],
         isPetsAllowed: propertyData.isPetsAllowed === "true",
         isParkingInclude: propertyData.isParkingIncluded === "true",
         pricePerMonth: parseFloat (propertyData.pricePerMonth),
@@ -264,7 +264,13 @@ const newProperty = await prisma.property.create({
         baths: parseInt(propertyData.baths),
         squareFeet: parseInt(propertyData.squareFeet),  
 
+    },
+
+    include:{
+        location : true,
+        manager: true
     }
+
 })
     } catch (error: any) {
         res.status(500).json({ message: `Error creating Property: ${error.message}` });

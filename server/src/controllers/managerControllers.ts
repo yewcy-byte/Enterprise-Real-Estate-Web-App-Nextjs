@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import { wktToGeoJSON } from "@terraformer/wkt";
 
 export const getManager = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -63,5 +64,50 @@ export const updateManager = async (
         res.json(updateManager);
     } catch (error: any) {
         res.status(500).json({ message: `Error updating manager: ${error.message}` });
+    }
+};
+
+
+export const getManagerProperties = async (req: Request, res: Response): Promise<void> => {
+    try {
+
+        const {cognitoId} = req.params;
+
+        const properties = await prisma.property.findMany({
+            where: { managerCognitoId: String(cognitoId) },
+            include: { location: true },
+        });
+
+        const propertiesWithFormattedLocations = await Promise.all(
+            properties.map(async (property) => {
+                const coordinates: { coordinates: string }[] = await prisma.$queryRaw`
+                    SELECT ST_asText(coordinates) as coordinates
+                    FROM "Location"
+                    WHERE id = ${property.locationId}
+                `;
+
+                const geoJSON: any = wktToGeoJSON(coordinates[0]?.coordinates || "");
+                const longtitude = geoJSON?.coordinates?.[0] ?? 0;
+                const latitude = geoJSON?.coordinates?.[1] ?? 0;
+
+                const existingLocation = (property as any).location || {};
+
+                return {
+                    ...property,
+                    location: {
+                        ...existingLocation,
+                        coordinates: {
+                            longitude: longtitude,
+                            latitude: latitude,
+                        },
+                    },
+                };
+            })
+        );
+
+        res.json(propertiesWithFormattedLocations);
+        
+    } catch (error: any) {
+        res.status(500).json({ message: `Error retrieving Manager Properties: ${error.message}` });
     }
 };

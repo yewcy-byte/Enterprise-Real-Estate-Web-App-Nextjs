@@ -8,6 +8,8 @@ import { authMiddleware } from "./middleware/authMiddleware.js";
 import tenantRoutes from "./routes/tenantRoutes.js";
 import ManagerRoutes from "./routes/managerRoutes.js";
 import propertyRoutes from "./routes/propertyRoutes.js";
+import leaseRoutes from "./routes/leaseRoutes.js";
+import applicationRoutes from "./routes/applicationRoutes.js";
 /* route import */
 
 
@@ -30,6 +32,8 @@ app.get('/', (req, res) =>{
 
 
 app.use("/properties", propertyRoutes);
+app.use("/applications", applicationRoutes);
+app.use("/leases", leaseRoutes);
 app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
 app.use("/managers", authMiddleware(["manager"]), ManagerRoutes);
 
