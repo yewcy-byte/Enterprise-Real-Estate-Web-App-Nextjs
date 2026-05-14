@@ -1,5 +1,6 @@
  import type { Request, Response } from "express";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { prisma } from "../lib/prisma.js";
 import { wktToGeoJSON } from "@terraformer/wkt";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
@@ -7,15 +8,12 @@ import axios from "axios";
 import type { Location } from "@prisma/client";
 
 
-const prisma = new PrismaClient();
-
 const awsRegion = process.env.AWS_REGION;
 const s3Client = awsRegion ? new S3Client({ region: awsRegion }) : new S3Client({});
 
 export const getProperties = async (req: Request, res: Response): Promise<void> => {
     try {
      const {
-        favouriteIds,
         priceMin,
         priceMax,
         beds,
@@ -24,124 +22,99 @@ export const getProperties = async (req: Request, res: Response): Promise<void> 
         squareFeetMin,
         squareFeetMax,
         amenities,
-        availableFrom,
-        latitude,
-        longitude
      } = req.query;
 
-     let whereConditions : Prisma.Sql[] = [];
-
-     if (favouriteIds) {
-        const favouriteIdsArray = (favouriteIds as string).split(",").map(Number);
-        whereConditions.push(Prisma.sql`id IN (${Prisma.join(favouriteIdsArray)})`);
-     }
+     const where: any = {};
 
      if(priceMin){
-        whereConditions.push(
-            Prisma.sql`p."pricePerMonth" >= ${Number(priceMin)}`
-        )
+        where.pricePerMonth = { ...where.pricePerMonth, gte: Number(priceMin) };
      }
 
      if (priceMax){
-        whereConditions.push(
-            Prisma.sql`p."pricePerMonth" <= ${Number(priceMax)}`
-        )
+        where.pricePerMonth = { ...where.pricePerMonth, lte: Number(priceMax) };
      }
 
-       if (beds && beds !=="any"){
-        whereConditions.push(
-            Prisma.sql`p."beds" >= ${Number(beds)}`
-        )
+     if (beds && beds !=="any"){
+        where.beds = { gte: Number(beds) };
      }
 
-         if (baths && baths !=="any"){
-        whereConditions.push(
-            Prisma.sql`p."baths" >= ${Number(baths)}`
-        )
-     }
-
-     if (squareFeetMax){
-        whereConditions.push(
-            Prisma.sql`p."squareFeet" <= ${Number(squareFeetMax)}`
-        )
+     if (baths && baths !=="any"){
+        where.baths = { gte: Number(baths) };
      }
 
      if (squareFeetMin){
-        whereConditions.push(
-            Prisma.sql`p."squareFeet" >= ${Number(squareFeetMin)}`
-        )
+        where.squareFeet = { ...where.squareFeet, gte: Number(squareFeetMin) };
+     }
+
+     if (squareFeetMax){
+        where.squareFeet = { ...where.squareFeet, lte: Number(squareFeetMax) };
      }
 
      if (propertyType && propertyType !== "any"){
-        whereConditions.push(
-            Prisma.sql`p."propertyType" = ${propertyType}::"PropertyType"`
-        )
+        where.propertyType = propertyType;
      }
 
-          if (amenities && amenities !== "any"){
-            const amenitiesArray = (amenities as string).split(",");
-        whereConditions.push(
-            Prisma.sql`p."amenities" @> ${Prisma.join(amenitiesArray, ",")}::"Amenity"[]`
-        )
+     if (amenities && amenities !== "any"){
+        const amenitiesArray = (amenities as string).split(",");
+        where.amenities = { hasSome: amenitiesArray };
      }
 
-     if (availableFrom && availableFrom !== "any"){
-        const availableFromDate = typeof availableFrom === "string"? availableFrom: null;
-        if (availableFromDate){
-            const date = new Date(availableFromDate)
-        if (!isNaN(date.getTime()))
-        whereConditions.push(
-            Prisma.sql`EXISTS(
-                SELECT : FROM "Lease" l
-                WHERE l."propertyId" = p.id
-                AND l."startDate" <= ${date.toISOString()}
-            )`
-        )
+     const properties = await prisma.property.findMany({
+        where,
+        include: { location: true }
+     });
+
+     // Query WKT coordinates separately since PostGIS isn't parsed properly
+     const coordsMap = new Map();
+     try {
+        const wktCoords: any[] = await prisma.$queryRaw`
+            SELECT l.id, ST_AsText(l.coordinates) as wkt 
+            FROM "Location" l
+        `;
+        wktCoords.forEach((row: any) => {
+            coordsMap.set(row.id, row.wkt);
+        });
+     } catch (err) {
+        console.warn('Could not fetch WKT coordinates:', err);
+     }
+
+     // Convert PostGIS geography to JSON coordinates
+     const propertiesWithCoords = properties.map((property: any) => {
+        let coordinates = { latitude: 34.05, longitude: -118.25 }; // Default to LA
+        
+        const wkt = coordsMap.get(property.location?.id);
+        if (wkt) {
+            try {
+                console.log(`[${property.name}] Raw WKT:`, wkt);
+                
+                const geoJSON: any = wktToGeoJSON(wkt);
+                console.log(`[${property.name}] Parsed:`, geoJSON);
+                
+                if (geoJSON && Array.isArray(geoJSON.coordinates) && geoJSON.coordinates.length >= 2) {
+                    coordinates = {
+                        longitude: geoJSON.coordinates[0],
+                        latitude: geoJSON.coordinates[1]
+                    };
+                    console.log(`[${property.name}] SUCCESS:`, coordinates);
+                }
+            } catch (err: any) {
+                console.error(`[${property.name}] Parse error:`, err.message);
+            }
         }
-     }
+        
+        return {
+            ...property,
+            location: {
+                ...property.location,
+                coordinates
+            }
+        };
+     });
 
-     if (latitude && longitude){
-        const lat = parseFloat(latitude as string)
-        const lng = parseFloat(longitude as string)
-        const radiusInKilometers = 1000
-        const degrees = radiusInKilometers / 111
-
-        whereConditions.push(
-            Prisma.sql`ST_DWithin(
-                l.coodinates :: geometry,
-                ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326),
-                ${degrees}
-            )`
-        )
-     }
-
-     const completeQuery = Prisma.sql`
-     SELECT p.*,
-     json_build_object(
-        'id', l.id,
-        "address", l.address,
-        "city", l.city,
-        "state", l.state,
-        "country", l.country,
-        "postalCode", l.postalCode,
-        "coordinates", json_build_object(
-            'latitude', ST_Y(l.coordinates::geometry),
-            'longitude', ST_X(l.coordinates::geometry)
-        )
-
-      ) as location
-     FROM "Property" p
-     JOIN "Location" l ON p."locationId" = l.id
-     ${
-        whereConditions.length > 0
-        ? Prisma.sql `WHERE ${Prisma.join(whereConditions, " AND ")}`
-        : Prisma.empty
-     }`
-        const properties = await prisma.$queryRaw(completeQuery);
-
+     res.json(propertiesWithCoords);
 
     } catch (error: any) {
-        res.status(500).json({ message: `Error retrieving Manager: ${error.message}` });
+        res.status(500).json({ message: `Error retrieving properties: ${error.message}` });
     }
 };
 
