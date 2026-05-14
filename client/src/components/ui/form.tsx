@@ -24,11 +24,11 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 );
 
 const FormField = React.forwardRef<
-  React.ElementRef<typeof Controller>,
+  HTMLDivElement,
   React.ComponentPropsWithoutRef<typeof Controller>
->(({ ...props }, ref) => (
+>(({ ...props }, _ref) => (
   <FormFieldContext.Provider value={{ name: props.name }}>
-    <Controller ref={ref} {...props} />
+    <Controller {...props} />
   </FormFieldContext.Provider>
 ));
 FormField.displayName = "FormField";

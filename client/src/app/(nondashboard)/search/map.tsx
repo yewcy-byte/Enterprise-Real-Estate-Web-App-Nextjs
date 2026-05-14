@@ -26,6 +26,7 @@ const Map = () => {
         if (!mapCotainerRef.current) return;
         
         try {
+            let isActive = true;
             const map = new mapboxgl.Map({
                 container: mapCotainerRef.current,
                 style: 'mapbox://styles/mapbox/streets-v12',
@@ -49,10 +50,18 @@ const Map = () => {
                 });
             }
 
-            const resizeMap = () => setTimeout(() => map.resize(), 700);
-            resizeMap();
+            const resizeTimer = window.setTimeout(() => {
+                if (!isActive) return;
+                try {
+                    map.resize();
+                } catch {
+                    // no-op: map may already be disposed during route changes
+                }
+            }, 700);
         
             return () => {
+                isActive = false;
+                window.clearTimeout(resizeTimer);
                 map.remove();
             };
         } catch (error) {

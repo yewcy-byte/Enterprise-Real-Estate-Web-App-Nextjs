@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { cleanParams } from '@/lib/utils';
 import { setFilters } from '@/state';
 import Map from './map';
+import Listings from './Listings';
 
 const SearchPage = () => {
 
@@ -56,7 +57,7 @@ const SearchPage = () => {
 
             <Map/>
             <div className='basis-4/12 overflow-y-auto'>
-            {/*<Listings/>*/}
+            <Listings/>
             </div>
         </div>
     </div>

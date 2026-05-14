@@ -119,6 +119,11 @@ export const addFavoriteProperty = async (req: Request, res: Response): Promise<
             include: { favorites: true }
         });
 
+        if (!tenant) {
+            res.status(404).json({ message: "Tenant not found" });
+            return;
+        }
+
         const propertyIdNumber = Number(propertyId);
         const existingFavourites = (tenant as any)?.favorites || [];
 
@@ -132,9 +137,10 @@ export const addFavoriteProperty = async (req: Request, res: Response): Promise<
                 },
                 include: { favorites: true }
             });
-            res.json (updatedTenant)
-        } else{
-            res.status(400).json({ message: "Property already in favorites" });
+            res.json(updatedTenant)
+        } else {
+            // Keep endpoint idempotent: already-favorited is a successful no-op
+            res.json(tenant);
         }
 
     } catch (error: any) {

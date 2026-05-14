@@ -16,6 +16,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { AmenityIcons, AmenityEnum } from '@/lib/constants';
 import { Label } from '@/components/label';
 import { formatEnumString } from '@/lib/utils';
+import { TelemetryPlugin } from 'next/dist/build/webpack/plugins/telemetry-plugin/telemetry-plugin';
 
 const FiltersFull = () => {
 
@@ -63,10 +64,6 @@ const FiltersFull = () => {
         updateURL(initialState.filters as any);
     }
 
-    const handleLocationSearch = () => {
-        handleSubmit();
-    }
-
     const handleAmenityChange = (amenity: AmenityEnum) => {
       setLocalFilters((prev: any) => ({
         ...prev,
@@ -75,6 +72,30 @@ const FiltersFull = () => {
           : [...prev.amenities, amenity],
       }));
     }
+
+    const handleLocationSearch = async () => {
+      try{
+
+      
+      const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(localFilters.location)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&fuzzyMatch=true`);
+      const data = await response.json();
+      if (data.features && data.features.length > 0){
+        const [lng,lat] = data.features[0].center;
+        const updatedFilters = {
+          ...localFilters,
+          coordinates: [lng, lat]
+        };
+        setLocalFilters(updatedFilters);
+        dispatch(setFilters(updatedFilters as any));
+        updateURL(updatedFilters as any);
+      } else {
+        handleSubmit();
+      }
+    }
+  catch (error){
+    console.error("Error fetching geocoding data:", error);
+  }
+}
 
     if (!isFiltersFullOpen){
         return null;

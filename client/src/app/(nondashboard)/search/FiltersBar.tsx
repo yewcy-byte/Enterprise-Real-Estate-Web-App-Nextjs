@@ -46,12 +46,6 @@ const FiltersBar = () => {
 
     })
     
-
-
-    const handleLocationSearch = () => {
-        handleFilterChange("location", searchInput || "any", null);
-    };
-
     const handleFilterChange = (
         key:string,
         value: any,
@@ -83,6 +77,29 @@ const FiltersBar = () => {
         dispatch(setFilters(newFilters));
         updateURL(newFilters);
     };
+
+
+        const handleLocationSearch = async () => {
+            try {
+                const response = await fetch(
+                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchInput)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&fuzzyMatch=true`
+                );
+                const data = await response.json();
+                if (data.features && data.features.length > 0) {
+                    const [lng, lat] = data.features[0].center;
+                    const newFilters = {
+                        ...filters,
+                        location: searchInput || "any",
+                        coordinates: [lng, lat],
+                    } as FilterState;
+
+                    dispatch(setFilters(newFilters));
+                    updateURL(newFilters);
+                }
+            } catch (error) {
+                console.error("Error fetching geocoding data:", error);
+            }
+        }
 
     return (
         <div className='flex  w-full py-5 mr-auto space-x-2'>

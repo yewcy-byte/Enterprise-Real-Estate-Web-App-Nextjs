@@ -99,15 +99,57 @@ export const api = createApi({
         return {url: "properties", params}
     },
     providesTags: (result) =>
-      result?[
-        ...result.map(({ id }) => ({ type: "Properties" as const, id })),
-        {type:"Properties", id: "LIST" }
-      ] : [{type:"Properties", id: "LIST"}],
-    })
+      result
+        ? [
+            ...result.map(({ id }) => ({ type: "Properties" as const, id })),
+            { type: "Properties", id: "LIST" },
+          ]
+        : [{ type: "Properties", id: "LIST" }],
+    }),
+
+     // Tenant related endpoints
 
 
-    //Tenant related enpoints
-    addFa
+  getTenant: build.query<Tenant, string>({
+    query: (cognitoId) => `tenants/${cognitoId}`,
+    
+    
+    providesTags: (result) => [{type: "Tenants", id: result?.id}],
+    }),
+
+
+    addFavouriteProperty: build.mutation<Tenant, { cognitoId: string; propertyId: number }>(
+      {
+        query: ({ cognitoId, propertyId }) => ({
+          url: `tenants/${cognitoId}/favorites/${propertyId}`,
+          method: "POST",
+        }),
+        invalidatesTags: (result) => [
+          { type: "Tenants", id: result?.id },
+          { type: "Properties", id: "LIST" },
+        ],
+      }
+    ),
+
+
+
+
+
+    removeFavouriteProperty: build.mutation<Tenant, { cognitoId: string; propertyId: number }>(
+      {
+        query: ({ cognitoId, propertyId }) => ({
+          url: `tenants/${cognitoId}/favorites/${propertyId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: (result) => [
+          { type: "Tenants", id: result?.id },
+          { type: "Properties", id: "LIST" },
+        ],
+      }
+    ),
+
+
+    
   })
 });
 
@@ -116,6 +158,9 @@ export const {
   useUpdateTenantSettingsMutation,
   useUpdateManagerSettingsMutation,
   useGetPropertiesQuery,
+  useGetTenantQuery,
+  useAddFavouritePropertyMutation,
+  useRemoveFavouritePropertyMutation,
 } = api;
 
 
