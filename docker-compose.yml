@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database with PostGIS
   postgres:
@@ -24,8 +22,8 @@ services:
   # Backend Server
   server:
     build:
-      context: .
-      dockerfile: Dockerfile.server
+      context: ./server
+      dockerfile: Dockerfile
     container_name: real_estate_server
     depends_on:
       postgres:
@@ -46,8 +44,8 @@ services:
   # Frontend Client
   client:
     build:
-      context: .
-      dockerfile: Dockerfile.client
+      context: ./client
+      dockerfile: Dockerfile
     container_name: real_estate_client
     depends_on:
       - server
