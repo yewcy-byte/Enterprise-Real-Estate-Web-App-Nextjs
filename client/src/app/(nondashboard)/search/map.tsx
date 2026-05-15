@@ -25,8 +25,8 @@ const Map = () => {
     useEffect(() => {
         if (!mapCotainerRef.current) return;
         
+        let isActive = true;
         try {
-            let isActive = true;
             const map = new mapboxgl.Map({
                 container: mapCotainerRef.current,
                 style: 'mapbox://styles/mapbox/streets-v12',
@@ -34,15 +34,26 @@ const Map = () => {
                 zoom: 9,
             });
 
+            if (!isActive) {
+                map.remove();
+                return;
+            }
+
             console.log('Map initialized, properties:', properties?.length || 0);
 
             if (properties && properties.length > 0) {
                 properties.forEach((property) => {
+                    if (!isActive) return;
                     try {
                         console.log('Property location:', property.name, property.location);
                         const marker = createPropertyMarker(property, map);
-                        const markerElement = marker.getElement();
-                        markerElement.style.filter = 'invert(1)';
+                  
+
+
+                         const markerElement = marker.getElement();
+        const path = markerElement.querySelector("path[fill='#3FB1CE']");
+        if (path) path.setAttribute("fill", "#000000");
+
                         console.log('Marker added for:', property.name);
                     } catch (err) {
                         console.error('Error adding marker for', property.name, err);
@@ -62,7 +73,11 @@ const Map = () => {
             return () => {
                 isActive = false;
                 window.clearTimeout(resizeTimer);
-                map.remove();
+                try {
+                    map.remove();
+                } catch {
+                    // no-op
+                }
             };
         } catch (error) {
             console.error('Map initialization error:', error);
@@ -107,6 +122,7 @@ const createPropertyMarker = (property: Property , map: mapboxgl.Map): mapboxgl.
           </div>
         </div>
         `
+        
         )
     )
     .addTo(map);
