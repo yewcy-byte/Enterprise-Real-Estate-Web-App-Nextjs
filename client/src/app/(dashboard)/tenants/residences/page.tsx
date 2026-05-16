@@ -1,11 +1,11 @@
 "use client"
 import Loading from '@/components/ui/Loading'
-import { useGetAuthUserQuery, useGetPropertiesQuery, useGetTenantQuery } from '@/state/api'
+import { useGetAuthUserQuery, useGetCurrentResidencesQuery, useGetPropertiesQuery, useGetTenantQuery } from '@/state/api'
 import React from 'react'
 import Header from '@/components/ui/Header'
 import Card from '@/components/ui/Card'
 
-const Favorites = () => {
+const Residences = () => {
 
   const {data: authUser} = useGetAuthUserQuery()
   const {data: tenant} = useGetTenantQuery(authUser?.cognitoInfo?.userId || "",
@@ -15,25 +15,25 @@ const Favorites = () => {
   )
 
   const {
-    data: favouriteProperties,
+    data: currentResidences,
     isLoading,
     isError
-  } = useGetPropertiesQuery(
-    {favoriteIds: tenant?.favorites?.map((fav: {id: number}) => fav.id)},
-    {skip: !tenant?.favorites || tenant.favorites.length === 0}
-  )
+  } = useGetCurrentResidencesQuery(authUser?.cognitoInfo?.userId || "",{
+   
+    skip: !authUser?.cognitoInfo?.userId
+})
 
   if (isLoading) return <Loading />
-  if(isError) return <div>Error loading favorites.</div>
+  if(isError) return <div>Error loading current residences.</div>
 
   return (
     <div className='dashboard-container'>
       <Header 
-      title="Favorited Properties"
-      subtitle="Browse and manage your saved property listings"
+      title="Current Residences"
+      subtitle="Browse and manage your current residence listings"
       />
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-        {favouriteProperties?.map((property) => (
+        {currentResidences?.map((property) => (
              <Card
               key={property.id}
               property={property}
@@ -43,11 +43,11 @@ const Favorites = () => {
               propertyLink={`/tenants/residences/${property.id}`}
                                         />))}
       </div>
-      {(!favouriteProperties||favouriteProperties.length === 0) && (
-        <p>You don't have any favorited properties.</p>
+      {(!currentResidences||currentResidences.length === 0) && (
+        <p>You don't have any current residences.</p>
       )}
     </div>
   )
 }
 
-export default Favorites
+export default Residences

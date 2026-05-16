@@ -1,0 +1,46 @@
+"use client"
+import Loading from '@/components/ui/Loading'
+import { useGetAuthUserQuery, useGetManagerPropertiesQuery, useGetPropertiesQuery, useGetTenantQuery } from '@/state/api'
+import React from 'react'
+import Header from '@/components/ui/Header'
+import Card from '@/components/ui/Card'
+
+const Properties = () => {
+
+  const {data: authUser} = useGetAuthUserQuery()
+ const {
+    data: managerProperties,
+    isLoading,
+    error
+ } = useGetManagerPropertiesQuery(authUser?.cognitoInfo?.userId || "",{
+    skip: !authUser?.cognitoInfo?.userId
+ })
+
+  if (isLoading) return <Loading />
+  if(error) return <div>Error loading manager properties.</div>
+
+  return (
+    <div className='dashboard-container'>
+      <Header 
+      title="My Properties"
+      subtitle="View and manage your property listings"
+      />
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+        {managerProperties?.map((property) => (
+             <Card
+              key={property.id}
+              property={property}
+              isFavorite={false}
+              onFavoriteToggle={() => {}}
+              showFavoriteButton={false}
+              propertyLink={`/managers/properties/${property.id}`}
+                                        />))}
+      </div>
+      {(!managerProperties||managerProperties.length === 0) && (
+        <p>You don't have any properties.</p>
+      )}
+    </div>
+  )
+}
+
+export default Properties
