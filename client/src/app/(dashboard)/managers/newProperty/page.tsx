@@ -17,9 +17,7 @@ const NewProperty = () => {
 
   const form = useForm<PropertyFormData>({
 
-    resolver: zodResolver(propertySchema) as any,
-
-    defaultValues: {
+    resolver: zodResolver(propertySchema) as any, defaultValues: {
       name: "",
       description: "",
       pricePerMonth: 1000,

@@ -20,12 +20,12 @@ const Properties = () => {
   if(error) return <div>Error loading manager properties.</div>
 
   return (
-    <div className='dashboard-container'>
+    <div className='dashboard-container '>
       <Header 
       title="My Properties"
       subtitle="View and manage your property listings"
       />
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+      <div className='p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
         {managerProperties?.map((property) => (
              <Card
               key={property.id}

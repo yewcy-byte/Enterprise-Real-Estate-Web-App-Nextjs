@@ -77,7 +77,7 @@ const Navbar = () => {
               className="md:ml-4 bg-primary-50 text-primary-700"
               onClick={() =>
                 router.push(
-                  userRole === "manager" ? "/managers/newproperty" : "/search"
+                  userRole === "manager" ? "/managers/newProperty" : "/search"
                 )
               }
             >
