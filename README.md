@@ -21,3 +21,5 @@ Client side - easier to implement with external libaries and documentation can b
 Server side - sends less amount of data via the network which means faster speed 
 
 {...} is called spread operator, is copies all the properties that is already in the object to be used again, used for reformating to JSON object for example  ...property.location
+
+use Toast from sonner shadcn to show pop up messages
