@@ -23,3 +23,11 @@ Server side - sends less amount of data via the network which means faster speed
 {...} is called spread operator, is copies all the properties that is already in the object to be used again, used for reformating to JSON object for example  ...property.location
 
 use Toast from sonner shadcn to show pop up messages
+
+AWS Setup Notes:
+set up a VPC virtual private cloud
+set up 3 subnets 2 private 1 public
+set up internet gateway and connect to VPC
+set up 3 route table and associate with the subnets
+add a new internet gateway route in the public route table
+created an EC2 which is like a computer running the backend server
