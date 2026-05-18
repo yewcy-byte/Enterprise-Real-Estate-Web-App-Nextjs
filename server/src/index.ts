@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
+import "./lib/env.js";
 import bodyParser from"body-parser";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -14,7 +14,6 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 
 
 /* configurations */
-dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(helmet());
