@@ -31,3 +31,5 @@ set up internet gateway and connect to VPC
 set up 3 route table and associate with the subnets
 add a new internet gateway route in the public route table
 created an EC2 which is like a computer running the backend server
+connected to the EC2 and ran configurations link : https://github.com/ed-roh/real-estate-prod/blob/master/server/aws-ec2-instructions.md
+
